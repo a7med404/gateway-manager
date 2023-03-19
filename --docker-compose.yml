@@ -1,0 +1,51 @@
+version: '3.7'
+
+services:
+  api:
+    container_name: api
+    build:
+      context: ./backend
+      target: development
+    env_file:
+      - .env
+    environment:
+      - DATABASE_URI=${DATABASE_URI}
+    depends_on:
+      - mongodb
+    volumes:
+      - ./backend:/usr/src/app/backend
+      - /usr/src/app/backend/node_modules
+    ports:
+      - ${SERVER_PORT}:${SERVER_PORT}
+    command: yarn start:dev
+
+  mongodb:
+    container_name: 'mongodb'
+    image: mongo:5.0.5
+    ports:
+      - 27017:27017
+    env_file:
+      - .env
+    environment:
+      - MONGO_INITDB_DATABASE=${MONGO_INITDB_DATABASE}
+      - MONGO_INITDB_ROOT_USERNAME=
+      - MONGO_INITDB_ROOT_PASSWORD=
+    volumes:
+      - mongodata:/data/db
+    restart: unless-stopped
+
+  frontend:
+    container_name: frontend
+    build:
+      context: ./frontend
+    env_file:
+      - .env
+    ports:
+      - ${NUXT_PORT}:${NUXT_PORT}
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    command: yarn dev
+
+volumes:
+  mongodata: null

@@ -1,0 +1,1277 @@
+openapi: 3.0.0
+info:
+  title: Orders & Payments - Checkout API
+  description: ''
+  version: 1.0.0
+servers:
+  - url: http://127.0.0.1:5000/api/v1
+  - url: http://127.0.0.1:3000
+paths:
+  /merchants/{id}:
+    get:
+      summary: Finds merchant (parking) by id
+      tags:
+        - offering
+      parameters:
+        - $ref: '#/components/parameters/domain'
+        - $ref: '#/components/parameters/lang'
+        - $ref: '#/components/parameters/X-PARKOS-APPS'
+        - in: path
+          name: id
+          description: Merchant ID of pet that needs to be fetched
+          required: true
+          schema:
+            type: number
+        - in: query
+          name: parkingType
+          description: Parking type.
+          required: true
+          schema:
+            type: string
+            enum:
+              - indoor
+              - outdoor
+              - valet
+              - valetindoor
+        - in: query
+          name: arrival
+          description: Arrival date Format => YYYY-MM-DD
+          required: true
+          schema:
+            type: string
+            format: date
+        - in: query
+          name: arrivalTime
+          description: 'Arrival time. Format: HH:MM'
+          
+          required: true
+          schema:
+            type: string
+            pattern: ^\d{2}:\d{2}$
+        - in: query
+          name: departure
+          description: Departure date Format => YYYY-MM-DD
+          required: true
+          schema:
+            type: string
+            format: date
+        - in: query
+          name: departureTime
+          description: 'Departure time. Format: HH:MM'
+          required: true
+          schema:
+            type: string
+            pattern: ^\d{2}:\d{2}$
+      responses:
+        '200':
+          description: Successful
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - data
+                properties:
+                  data:
+                    $ref: '#/components/schemas/MerchantParkingType'
+  /offers:
+    post:
+      summary: Finds offer for the current merchant (cart)
+      tags:
+        - offering
+      parameters:
+        - $ref: '#/components/parameters/domain'
+        - $ref: '#/components/parameters/lang'
+        - $ref: '#/components/parameters/X-PARKOS-APPS'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OfferRquestBody'
+      responses:
+        '200':
+          description: Successful
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - data
+                properties:
+                  data:
+                    type: object
+                    required:
+                      - offer
+                      - paymentMethods
+                    properties:
+                      offer:
+                        $ref: '#/components/schemas/Offer'
+                      paymentMethods:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/PaymentMethod'
+  /airports:
+    get:
+      summary: get active airports
+      tags:
+        - offering
+      description: get active airports (locations)
+      parameters:
+        - $ref: '#/components/parameters/domain'
+        - $ref: '#/components/parameters/lang'
+        - $ref: '#/components/parameters/X-PARKOS-APPS'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - airports
+                properties:
+                  airports:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Airport'
+  /orders:
+    post:
+      summary: create new order (reservation)
+      tags:
+        - orders
+      parameters:
+        - $ref: '#/components/parameters/domain'
+        - $ref: '#/components/parameters/lang'
+        - $ref: '#/components/parameters/X-PARKOS-APPS'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - cart
+              properties:
+                cart:
+                  $ref: '#/components/schemas/Cart'
+      responses:
+        '200':
+          description: Successful
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - data
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Order'
+  /orders/{id}:
+    get:
+      summary: Finds order (reservation) by order_id
+      tags:
+        - orders
+      parameters:
+        - $ref: '#/components/parameters/domain'
+        - $ref: '#/components/parameters/lang'
+        - $ref: '#/components/parameters/X-PARKOS-APPS'
+        - in: path
+          name: id
+          description: Order ID of pet that needs to be fetched
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Successful
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - data
+                properties:
+                  data:
+                    $ref: '#/components/schemas/OrderInfo'
+        '404':
+          description: Order not found
+  /payments:
+    post:
+      summary: create new payment (create payment url)
+      tags:
+        - orders
+      parameters:
+        - $ref: '#/components/parameters/domain'
+        - $ref: '#/components/parameters/lang'
+        - $ref: '#/components/parameters/X-PARKOS-APPS'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - orderId
+                - redirectUrl
+              properties:
+                orderId:
+                  description: Order ID
+                  type: number
+                  format: uuid
+                redirectUrl:
+                  description: >-
+                    Redirect URL. The User is redirected to the url after
+                    payment process for both cases (success or fail).
+                  type: string
+                  format: uri
+      responses:
+        '200':
+          description: Successful
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - data
+                properties:
+                  data:
+                    $ref: '#/components/schemas/CreatPayment'
+  /translations:
+    get:
+      summary: get translations list for the current language
+      tags:
+        - content
+      parameters:
+        - $ref: '#/components/parameters/domain'
+        - $ref: '#/components/parameters/lang'
+        - $ref: '#/components/parameters/X-PARKOS-APPS'
+      responses:
+        '200':
+          description: Successful
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - translations
+                properties:
+                  translations:
+                    $ref: '#/components/schemas/Translations'
+  /languages:
+    get:
+      summary: get languages list
+      tags:
+        - content
+      parameters:
+        - $ref: '#/components/parameters/domain'
+        - $ref: '#/components/parameters/lang'
+      responses:
+        '200':
+          description: Successful
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - languages
+                properties:
+                  languages:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Language'
+  /countries:
+    get:
+      summary: get countries list
+      tags:
+        - content
+      description: get active countries
+      parameters:
+        - $ref: '#/components/parameters/domain'
+        - $ref: '#/components/parameters/lang'
+        - $ref: '#/components/parameters/X-PARKOS-APPS'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - countries
+                properties:
+                  countries:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Country'
+  /settings:
+    get:
+      tags:
+        - content
+      parameters:
+        - $ref: '#/components/parameters/domain'
+        - $ref: '#/components/parameters/lang'
+        - $ref: '#/components/parameters/X-PARKOS-APPS'
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - settings
+                properties:
+                  settings:
+                    $ref: '#/components/schemas/Settings'
+components:
+  parameters:
+    domain:
+      in: query
+      name: domain
+      example: parkos.nl.test
+      required: false
+      schema:
+        type: string
+    lang:
+      in: query
+      name: lang
+      schema:
+        type: string
+      required: false
+    X-PARKOS-APPS:
+      name: X-PARKOS-APPS
+      in: header      
+      example: AoL3aHHFWgpH*3Ga.ba.VrpA!B7F@C32.hP*@RdF
+      description: an authorization app token
+      required: true
+      schema:
+        type: string
+  schemas:
+    Error:
+      type: object
+      required:
+        - error
+      properties:
+        error:
+          type: object
+          required:
+            - code
+            - message
+          properties:
+            code:
+              type: number
+              description: Error code
+            message:
+              type: string
+              description: Human readable error message.
+            details:
+              type: object
+    MerchantParkingType:
+      type: object
+      required:
+        - id
+        - name
+        - termsLink
+        - slug
+        - logo
+        - fromPrice
+        - media
+        - location
+        - address
+        - country
+        - additional
+        - parkingType
+        - products
+        - packages
+      properties:
+        id:
+          type: number
+        name:
+          type: string
+        termsLink:
+          type: string
+        slug:
+          type: string
+        logo:
+          type: string
+        fromPrice:
+          type: number
+        media:
+          type: array
+          items:
+            $ref: '#/components/schemas/Media'
+        location:
+          $ref: '#/components/schemas/Location'
+        additional:
+          type: object
+          properties:
+            transferType:
+              type: string
+            distance:
+              type: integer
+            indoor:
+              type: boolean
+            openFrom:
+              type: string
+              default: ''
+            openTill:
+              type: string
+              default: ''
+            officialAirport:
+              type: boolean
+            carWashing:
+              type: boolean
+            coronaProof:
+              type: boolean
+            is_virtual:
+              type: boolean
+        address:
+          $ref: '#/components/schemas/Address'
+        country:
+          $ref: '#/components/schemas/MerchantCountry'
+        parkingType:
+          $ref: '#/components/schemas/ParkingTypeOptions'
+        products:
+          type: array
+          items:
+            $ref: '#/components/schemas/Product'
+        packages:
+          type: array
+          items:
+            $ref: '#/components/schemas/Product'
+    Address:
+      type: object
+      required:
+        - street
+        - zipCode
+        - city
+        - latitude
+        - longitude
+      properties:
+        street:
+          type: string
+        zipCode:
+          type: string
+        city:
+          type: string
+        latitude:
+          type: number
+        longitude:
+          type: number
+    MerchantCountry:
+      type: object
+      required:
+        - id
+        - code
+        - name
+        - currency
+      properties:
+        id:
+          type: number
+        code:
+          type: string
+        name:
+          type: string
+        currency:
+          type: object
+          required:
+            - id
+            - code
+          properties:
+            id:
+              type: number
+            code:
+              type: string
+    Country:
+      type: object
+      required:
+        - id
+        - code
+        - name
+        - phoneCode
+      properties:
+        id:
+          type: number
+        code:
+          type: string
+        name:
+          type: string
+        phoneCode:
+          type: string
+    Order:
+      type: object
+      required:
+        - id
+      properties:
+        id:
+          type: string
+          format: uuid
+    Price:
+      type: object
+      properties:
+        amount:
+          type: string
+          example: '72.44'
+        currency:
+          type: string
+          example: 'USD'
+        formatted:
+          type: string
+          example: '$ 72.44'
+
+    OrderInfo:
+      type: object
+      required:
+        - status
+        - paymentStatus
+      properties:
+        id:
+          type: string
+          example: '02e548b0-1b7d-48c3-a365-bbee5c55f3c4'
+        status:
+          type: string
+          enum:
+            - pending
+            - completed
+            - canceled
+            - unknown
+        paymentStatus:
+          type: string
+          enum:
+            - pending
+            - paid
+            - canceled
+            - unknown
+        price:
+          $ref: '#/components/schemas/Price'
+        isTimedOut:
+          type: boolean
+          example: true
+        createdAt:
+          type: string
+          example: '2022-10-08T04:11:53+02:00'
+        merchant:
+          type: object
+          properties:
+            id:
+              type: number
+              example: 123
+            name:
+              type: string
+              example: 'Sunrise Auto Sales'
+            slug:
+              type: string
+              example: 'sunrise-auto-sales'
+            reviews:
+              type: object
+              properties:
+                count:
+                  type: number
+                  example: 150
+                rating:
+                  type: number
+                  example: 8.5
+        customer:
+          type: object
+          properties:
+            name:
+              type: string
+              example: 'John Doe'
+            email:
+              type: string
+              example: 'john@exmaple.test'
+            phone:
+              type: string
+              example: '310123456789'
+        items:
+          type: array
+          items:
+            type: object
+            properties:
+              type:
+                type: string
+                example: 'reservation'
+              code:
+                type: string
+              price:
+                $ref: '#/components/schemas/Price'
+              details:
+                type: object
+                properties:
+                  arrival:
+                    type: string
+                    example: '2022-11-01'
+                  arrivalTime:
+                    type: string
+                    example: '21:30'
+                  departure:
+                    type: string
+                    example: '2022-10-15'
+                  departureTime:
+                    type: string
+                    example: '03:30'
+                  parkingType:
+                    type: string
+                    example: 'outdoor'
+                  customer:
+                    type: object
+                    properties:
+                      name:
+                        type: string
+                        example: 'John Doe'
+                      email:
+                        type: string
+                        example: 'john@exmaple.test'
+                      phone:
+                        type: string
+                        example: '310123456789'
+    CreatPayment:
+      type: object
+      required:
+        - paymentProviderUrl
+      properties:
+        paymentProviderUrl:
+          type: string
+          format: uri
+    ParkingTypeOptions:
+      type: object
+      required:
+        - latitude
+        - longitude
+        - departureFlightNumberRequired
+        - arrivalFlightNumberRequired
+        - carDetailsRequired
+        - phoneNumberRequired
+        - maxPersons
+        - arrivalOpeningTime
+        - arrivalClosingTime
+        - departureOpeningTime
+        - departureClosingTime
+        - evParking
+        - parkSleepFly
+        - fullTitle
+      properties:
+        latitude:
+          type: number
+        longitude:
+          type: number
+        departureFlightNumberRequired:
+          type: boolean
+        arrivalFlightNumberRequired:
+          type: boolean
+        carDetailsRequired:
+          type: boolean
+        phoneNumberRequired:
+          type: boolean
+        maxPersons:
+          type: number
+        arrivalOpeningTime:
+          type: string
+        arrivalClosingTime:
+          type: string
+        departureOpeningTime:
+          type: string
+        departureClosingTime:
+          type: string
+        evParking:
+          type: boolean
+        parkSleepFly:
+          type: boolean
+        fullTitle:
+          type: string
+    Product:
+      type: object
+      nullable: true
+      required:
+        - id
+        - name
+        - image
+        - price
+        - description
+      properties:
+        id:
+          type: number
+        name:
+          type: string
+        image:
+          type: string
+        price:
+          type: number
+        description:
+          type: string
+    Media:
+      type: object
+      required:
+        - id
+        - title
+        - url
+        - alt_tag
+        - type
+        - image
+        - slug
+      properties:
+        id:
+          type: number
+        title:
+          type: string
+        url:
+          type: string
+          pattern: url
+        alt_tag:
+          type: string
+        type:
+          type: string
+          enum:
+            - image
+            - video
+        image:
+          type: string
+        slug:
+          type: string
+    Location:
+      type: object
+      required:
+        - id
+        - name
+        - slug
+        - open_from
+        - open_till
+        - countryId
+      properties:
+        id:
+          type: number
+        name:
+          type: string
+        slug:
+          type: string
+        devtitle:
+          type: string
+        maintitle:
+          type: string
+        open_from:
+          type: string
+          pattern: ^\d{2}:\d{2}$
+        open_till:
+          type: string
+          pattern: ^\d{2}:\d{2}$
+        countryId:
+          type: number
+    PaymentMethod:
+      type: object
+      nullable: true
+      required:
+        - id
+        - name
+        - isOnlinePayment
+        - serviceFee
+        - isPercentage
+      properties:
+        id:
+          type: number
+        name:
+          type: string
+        isOnlinePayment:
+          type: boolean
+        serviceFee:
+          type: number
+        isPercentage:
+          type: boolean
+    Offer:
+      type: object
+      required:
+        - offer
+        - total
+        - totalWithoutFee
+        - taxesAndFeesTotal
+        - advanceFee
+        - hasAdvanceFee
+        - payOnSpot
+        - package
+        - products
+        - taxesAndFees
+        - paymentMethod
+      properties:
+        offer:
+          type: object
+          required:
+            - cars
+            - days
+            - nights
+            - price
+            - title
+            - fullTitle
+            - subtitle
+            - transferType
+          properties:
+            cars:
+              type: number
+            days:
+              type: number
+            price:
+              type: number
+            title:
+              type: string
+            fullTitle:
+              type: string
+            subtitle:
+              type: string
+            transferType:
+              type: string
+        total:
+          type: number
+        totalWithoutFee:
+          type: number
+        taxesAndFeesTotal:
+          type: number
+        advanceFee:
+          type: number
+          default: 0
+        hasAdvanceFee:
+          type: boolean
+        payOnSpot:
+          type: string
+        package:
+          $ref: '#/components/schemas/Product'
+        products:
+          type: array
+          items:
+            $ref: '#/components/schemas/Product'
+        taxesAndFees:
+          type: array
+          items:
+            $ref: '#/components/schemas/Fee'
+        paymentMethod:
+          $ref: '#/components/schemas/PaymentMethod'
+    Fee:
+      type: object
+      required:
+        - id
+        - name
+        - amount
+      properties:
+        id:
+          type: number
+        name:
+          type: string
+        amount:
+          type: number
+    Cart:
+      type: object
+      required:
+        - items
+        - conditions
+      properties:
+        items:
+          type: array
+          items:
+            oneOf:
+              - $ref: '#/components/schemas/ReservationCartItem'
+        conditions:
+          type: array
+          items:
+            oneOf:
+              - $ref: '#/components/schemas/CouponCodeCartCondition'
+    ReservationCartItem:
+      type: object
+      required:
+        - type
+        - data
+      properties:
+        type:
+          type: string
+          enum:
+            - reservation
+        data:
+          type: object
+          required:
+            - merchantId
+            - parkingType
+            - arrival
+            - arrivalTime
+            - departure
+            - departureTime
+            - productIds
+            - packageId
+            - car
+          properties:
+            merchantId:
+              type: number
+            parkingType:
+              type: string
+              enum:
+                - indoor
+                - outdoor
+                - valet
+                - valetindoor
+            arrival:
+              type: string
+              format: date
+            arrivalTime:
+              type: string
+              pattern: ^\d{2}:\d{2}$
+            departure:
+              type: string
+              format: date
+            departureTime:
+              type: string
+              pattern: ^\d{2}:\d{2}$
+            arrivalFlightNumber:
+              type: string
+            departureFlightNumber:
+              type: string
+            paymentMethodId:
+              type: number
+            travelPurpose:
+              type: number
+              enum:
+                - 1
+                - 2
+            AVParkos:
+              nullable: true
+              type: number
+              enum:
+                - 1
+            extraControl:
+              nullable: true
+              type: number
+              enum:
+                - 1
+            productIds:
+              type: array
+              items:
+                type: number
+            packageId:
+              type: number
+            car:
+              $ref: '#/components/schemas/Car'
+            extraCars:
+              type: array
+              items:
+                $ref: '#/components/schemas/Car'
+            company:
+              $ref: '#/components/schemas/Company'
+            ideal:
+              $ref: '#/components/schemas/Ideal'
+            SEPADirectDebits:
+              $ref: '#/components/schemas/SEPADirectDebits'
+            cancelInsurance:
+              $ref: '#/components/schemas/cancelInsurance'
+    CouponCodeCartCondition:
+      type: object
+      required:
+        - type
+        - data
+      properties:
+        type:
+          type: string
+        data:
+          type: object
+    OfferRquestBody:
+      type: object
+      required:
+        - merchantId
+        - parkingType
+        - arrival
+        - arrivalTime
+        - departure
+        - departureTime
+        - productIds
+        - extraCars
+      properties:
+          merchantId:
+            type: number
+          parkingType:
+            type: string
+            enum:
+              - indoor
+              - outdoor
+              - valet
+              - valetindoor
+          arrival:
+            type: string
+            format: date
+          arrivalTime:
+            type: string
+            pattern: ^\d{2}:\d{2}$
+          departure:
+            type: string
+            format: date
+          departureTime:
+            type: string
+            pattern: ^\d{2}:\d{2}$
+          paymentMethodId:
+            type: number
+          advanceFeePaymentMethodId:
+            type: number
+          productIds:
+            type: array
+            nullable: true
+            items:
+              type: number
+          packageId:
+            type: number
+          extraCars:
+            type: number
+          discountCode:
+            type: string
+    Translations:
+      type: object
+      required:
+        - general
+        - customer
+        - merchant
+        - templates
+        - reservation
+        - search
+      properties:
+        general:
+          $ref: '#/components/schemas/Translation'
+        customer:
+          $ref: '#/components/schemas/Translation'
+        merchant:
+          $ref: '#/components/schemas/Translation'
+        templates:
+          $ref: '#/components/schemas/Translation'
+        reservation:
+          $ref: '#/components/schemas/Translation'
+        search:
+          $ref: '#/components/schemas/Translation'
+    Translation:
+      type: string
+      additionalProperties:
+        type: string
+    Car:
+      type: object
+      required:
+        - email
+        - fullName
+        - phoneNumberCountry
+        - phoneNumber
+        - numberOfPeople
+        - makeAndModel
+        - plate
+      properties:
+        email:
+          type: string
+          format: email
+        fullName:
+          type: string
+        phoneNumberCountry:
+          type: string
+        phoneNumber:
+          type: string
+        numberOfPeople:
+          type: number
+        makeAndModel:
+          type: string
+        plate:
+          type: string
+    Company:
+      type: object
+      required:
+        - name
+        - address
+        - postalCode
+        - city
+        - countryId
+        - vatNumber
+      properties:
+        name:
+          type: string
+        address:
+          type: string
+        addressTwo:
+          type: string
+        postalCode:
+          type: string
+        city:
+          type: string
+        countryId:
+          type: number
+        vatNumber:
+          type: string
+    Ideal:
+      type: object
+      required:
+        - inputPaymentOptionItem
+      properties:
+        inputPaymentOptionItem:
+          type: number
+    SEPADirectDebits:
+      type: object
+      required:
+        - inputPaymentOptionCustomerName
+        - inputPaymentOptionCustomerIban
+      properties:
+        inputPaymentOptionCustomerName:
+          type: string
+        inputPaymentOptionCustomerIban:
+          type: string
+    cancelInsurance:
+      type: object
+      required:
+        - birthDate
+        - gender
+      properties:
+        birthDate:
+          type: object
+          required:
+            - day
+            - month
+            - year
+          properties:
+            day:
+              type: string
+            month:
+              type: string
+            year:
+              type: string
+        gender:
+          type: string
+    Language:
+      type: object
+      required:
+        - id
+        - lang
+        - name
+        - nativeName
+        - domain
+        - gtmKey
+        - socials
+        - country
+        - currency
+      properties:
+        id:
+          type: number
+        lang:
+          type: string
+        name:
+          type: string
+        nativeName:
+          type: string
+        domain:
+          type: string
+        gtmKey:
+          type: string
+        socials:
+          type: object
+          required:
+            - facebook
+            - twitter
+            - youtube
+          properties:
+            facebook:
+              type: string
+            twitter:
+              type: string
+            youtube:
+              type: string
+        country:
+          type: object
+          required:
+            - id
+            - code
+            - name
+          properties:
+            id:
+              type: number
+            code:
+              type: string
+            name:
+              type: string
+        currency:
+          type: string
+          required:
+            - id
+            - code
+            - name
+          properties:
+            id:
+              type: number
+            code:
+              type: string
+            name:
+              type: string
+    Airport:
+      type: object
+      required:
+        - id
+        - name
+        - maintitle
+        - devtitle
+        - slug
+      properties:
+        id:
+          type: number
+        name:
+          type: string
+        maintitle:
+          type: string
+        devtitle:
+          type: string
+        slug:
+          type: string
+    Settings:
+      type: object
+      required:
+        - defaultReservationCarLimit
+        - months
+        - customerService
+        - privacyPolicy
+      properties:
+        defaultReservationCarLimit:
+          type: number
+        months:
+          type: array
+          items:
+            type: object
+            required:
+              - id
+              - name
+            properties:
+              id:
+                type: number
+              name:
+                type: string
+        customerService:
+          type: object
+          required:
+            - isOpen
+            - url
+            - phoneNumber
+          properties:
+            isOpen:
+              type: boolean
+            url:
+              type: string
+            phoneNumber:
+              type: string
+        privacyPolicy:
+          type: object
+          nullable: true
+          required:
+            - title
+            - url
+          properties:
+            title:
+              type: string
+            url:
+              type: string
+        trustpilot:
+          type: object
+          required:
+            - templateId
+            - businessUnitId
+            - url
+            - fullLangTag
+          properties:
+            templateId:
+              type: string
+            businessUnitId:
+              type: string
+            url:
+              type: string
+            fullLangTag:
+              type: string

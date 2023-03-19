@@ -1,0 +1,90 @@
+image: node:16
+
+stages:
+  - build
+  - test
+  - deploy
+
+build_for_production_job:
+  stage: build
+  # tags: # tags
+  cache:
+    paths:
+      - node_modules/
+  artifacts:
+    expire_in: 1 day
+    name: "$CI_COMMIT_REF_SLUG-$CI_COMMIT_SHORT_SHA"
+    paths:
+      - ./dist
+  script:
+    - echo "This job compiles code."
+    - cp .env.production .env
+    - yarn
+    - yarn generate
+  only:
+  - master
+
+build_for_staging_job:
+  stage: build
+  # tags: # tags
+  cache:
+    paths:
+      - node_modules/
+  artifacts:
+    expire_in: 1 day
+    name: "$CI_COMMIT_REF_SLUG-$CI_COMMIT_SHORT_SHA"
+    paths:
+      - ./dist
+  script:
+    - echo "This job compiles code."
+    - cp .env.staging .env
+    - yarn
+    - yarn generate
+  only:
+  - develop
+
+
+test_job:
+  stage: test
+  # tags: # tags
+  variables:
+    GIT_STRATEGY: none
+  script:
+    - echo "This job tests code."
+    - yarn lint:js
+    - yarn lint
+    - yarn audit --level high --groups dependencies
+    - yarn test
+  only:
+  - develop
+
+deploy_to_staging:
+  stage: deploy
+  # tags: # tags
+  variables:
+    GIT_STRATEGY: none
+  before_script: []
+  environment:
+    name: staging
+    # url:  # site url for production
+  script:
+    - echo "This job deploys the code to staging server."
+    - rsync -rWzog --links --delete ./dist/  # path in your server for staging
+  only:
+    - develop
+
+
+deploy_to_production:
+  stage: deploy
+  # tags: # tags
+  variables:
+    GIT_STRATEGY: none
+  before_script: []
+  environment:
+    name: production
+    # url: # site url for production
+  script:
+    - echo "This job deploys the code to production server"
+    - rsync -rWzog --links --delete ./dist/ # path in your server for production
+  only:
+    - master
