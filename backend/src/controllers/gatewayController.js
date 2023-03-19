@@ -7,7 +7,6 @@ class GatewayController {
       const gateways = await Gateway.find().populate('devices');
       res.json(gateways);
     } catch (err) {
-      console.error(err);
       res.status(500).json({ message: 'Server error' });
     }
   }
@@ -22,7 +21,6 @@ class GatewayController {
       }
       res.json(gateway);
     } catch (err) {
-      console.error(err);
       res.status(500).json({ message: 'Server error' });
     }
   }
@@ -39,8 +37,12 @@ class GatewayController {
       if (error) {
         return res.status(400).send({ message: error.details[0].message });
       }
-
       const { serialNumber, name, ipv4Address } = req.body;
+
+      const gatewayExist = await Gateway.exists({ serialNumber: serialNumber });
+      if (gatewayExist) {
+        return res.status(400).send({ message: `Gateway with this serial number [${serialNumber}] already exist `});
+      }
 
       const gateway = new Gateway({
         serialNumber,
@@ -50,7 +52,6 @@ class GatewayController {
       await gateway.save();
       res.status(201).json(gateway);
     } catch (err) {
-      console.error(err);
       res.status(500).json({ message: 'Server error' });
     }
   }
@@ -66,7 +67,6 @@ class GatewayController {
       await Gateway.findByIdAndDelete(id);
       res.json({ message: 'Gateway deleted successfully' });
     } catch (err) {
-      console.error(err);
       res.status(500).json({ message: 'Server error' });
     }
   }

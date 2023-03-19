@@ -1,6 +1,7 @@
 import * as helper from './helper'
 
-const GATEWAY_END_POINT = '/gateways'; const DEVICE_END_POINT = '/devices'
+const GATEWAY_END_POINT = '/gateways';
+const DEVICE_END_POINT = '/devices'
 
 
 /**
@@ -12,7 +13,7 @@ const GATEWAY_END_POINT = '/gateways'; const DEVICE_END_POINT = '/devices'
 
  /**
   *
-  * @return Array[get]
+  * @return Object
   */
  export const fetchGateway = (id, _this) => helper.get(`${GATEWAY_END_POINT}/${id}`, _this)
 
@@ -21,46 +22,34 @@ const GATEWAY_END_POINT = '/gateways'; const DEVICE_END_POINT = '/devices'
  *
  *
  * @param { * }
- credentials
+ * @return Object
  */
- export const createGateway = (data, _this) =>
- helper.post(`${GATEWAY_END_POINT}`, data, _this)
-
-/**
- *
- *
- * @param { * }
- credentials
- */
-export const updateGateway = (data, _this) =>
-    helper.update(`${GATEWAY_END_POINT}/${id}`, data, _this)
+ export const createGateway = (data, _this) => helper.post(`${GATEWAY_END_POINT}`, data, _this)
 
 /**
  *
  *
  * @param {*} data
  */
- export const deleteGateway = (id, _this) =>
- helper.del(`${GATEWAY_END_POINT}/${id}`, _this)
-
-
+ export const deleteGateway = (id, _this) => helper.del(`${GATEWAY_END_POINT}/${id}`, _this)
 
 
 /**
  *
  *
  * @param { * }
- credentials
+ * @return Object
  */
- export const createDevice = (data, _this) =>
- helper.post(`${DEVICE_END_POINT}`, data, _this)
-
-
+ export const createDevice = (data, _this) => {
+  const gatewayId = data.gatewayId
+  delete data.gatewayId
+  return helper.post(`${GATEWAY_END_POINT}/${gatewayId}${DEVICE_END_POINT}`, data, _this)
+ }
 
 /**
  *
  *
  * @param {*} data
  */
- export const deleteDevice = (id, _this) =>
- helper.del(`${DEVICE_END_POINT}/${id}`, _this)
+ export const deleteDevice = (data, _this) =>
+ helper.del(`${GATEWAY_END_POINT}/${data.gatewayId}${DEVICE_END_POINT}/${data.id}`, _this)

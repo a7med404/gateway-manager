@@ -29,7 +29,6 @@ export default {
     icon: 'error',
     iconPack: 'fontawesome',
     register: [
-      // Register custom toasts
       {
         name: 'my-error',
         message: 'Oops...Something went wrong',
@@ -51,7 +50,7 @@ export default {
   modules: ['@nuxtjs/axios', '@nuxtjs/toast'],
 
   axios: {
-    baseURL: process.env.BASE_URL,
+    baseURL: process.env.BASE_URL || 'http://127.0.0.1:5000/api/v1/',
     common: {
       Accept: 'application/json',
     },
@@ -60,7 +59,7 @@ export default {
   },
   proxy: {
     '/api': {
-      target: process.env.PROXY_BASE_URL,
+      target: process.env.PROXY_BASE_URL || 'http://127.0.0.1:5000',
       pathRewrite: {
         '^/api': '/',
       },

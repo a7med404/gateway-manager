@@ -25,6 +25,11 @@ class DeviceController {
         return res.status(404).send({ message: 'Gateway not found' });
       }
 
+      const deviceExist = await Device.exists({ uid: uid });
+      if (deviceExist) {
+        return res.status(400).send({ message: `Device with this UID [${uid}] already exist `});
+      }
+
       if (gateway.devices.length >= 10) {
         return res.status(400).send({ message: 'Gateway device limit exceeded' });
       }
@@ -43,7 +48,6 @@ class DeviceController {
 
       res.status(201).json(device);
     } catch (err) {
-      console.error(err);
       res.status(500).json({ message: 'Server error' });
     }
   }
@@ -69,7 +73,6 @@ class DeviceController {
 
       res.json({ message: 'Device removed successfully' });
     } catch (err) {
-      console.error(err);
       res.status(500).json({ message: 'Server error' });
     }
   }

@@ -1,24 +1,18 @@
 <template>
-  <!-- component -->
   <section class="antialiased bg-gray-100 text-gray-600 h-screen px-4">
     <div class="flex flex-col justify-center h-full">
-      <!-- Table -->
-      <!-- component -->
-
       <div
         v-if="gateway"
         class="w-full max-w-2xl mx-auto bg-white shadow-lg rounded-sm border border-gray-200"
       >
-        <!-- component -->
         <div class="py-4 px-8 bg-white shadow-lg rounded-lg my-5">
           <div>
-          </button>
             <h2 class="text-gray-800 text-3xl font-semibold">
               Gateway [{{ gateway.name }}] Details
             </h2>
             <p
               class="mt-2 text-gray-600"
-              v-text="`IP Address: ${gateway.iPv4Address}`"
+              v-text="`IP Address: ${gateway.ipv4Address}`"
             ></p>
           </div>
           <div class="flex justify-between mt-4">
@@ -35,8 +29,8 @@
               @click="dailog = !dailog"
             >
             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
-</svg>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
               Add Device
             </button>
           </div>
@@ -47,7 +41,7 @@
             Gateway's devices [{{ gateway.devices.length }}]
           </h2>
         </header>
-        <div class="max-h-72 overflow-y-scroll p-3">
+        <div class="overflow-y-scroll p-3">
           <div class="overflow-x-auto">
             <table class="table-auto w-full">
               <thead
@@ -57,13 +51,16 @@
               >
                 <tr>
                   <th class="p-2 whitespace-nowrap">
+                    <div class="font-semibold text-left">UID</div>
+                  </th>
+                  <th class="p-2 whitespace-nowrap">
                     <div class="font-semibold text-left">Vendor</div>
                   </th>
                   <th class="p-2 whitespace-nowrap">
                     <div class="font-semibold text-center">Status</div>
                   </th>
                   <th class="p-2 whitespace-nowrap">
-                    <div class="font-semibold text-left">Created At</div>
+                    <div class="font-semibold text-left">Created Date</div>
                   </th>
                   <th class="p-2 whitespace-nowrap  text-center">
                     <div class="font-semibold">Actions</div>
@@ -71,8 +68,15 @@
                 </tr>
               </thead>
               <tbody v-if="gateway" class="text-sm divide-y divide-gray-100">
-                <tr v-for="device in gateway.devices" :key="device.id">
+                <tr v-for="device in gateway.devices" :key="device._id">
                   <td class="p-2 whitespace-nowrap">
+                    <div class="flex items-center">
+                      <div
+                        class="font-medium text-gray-800"
+                        v-text="device.uid"
+                      ></div>
+                    </div>
+                  </td><td class="p-2 whitespace-nowrap">
                     <div class="flex items-center">
                       <div
                         class="font-medium text-gray-800"
@@ -84,7 +88,7 @@
                     <div
                       class="text-center font-medium"
                       :class="
-                        device.status == 'OFFLINE'
+                        device.status == 'offline'
                           ? 'text-red-500'
                           : 'text-green-500'
                       "
@@ -92,14 +96,14 @@
                     ></div>
                   </td>
                   <td class="p-2 whitespace-nowrap">
-                    <div class="text-left" v-text="device.createdAt"></div>
+                    <div class="text-left" v-text="formatDate(deviceForm.createdDate)"></div>
                   </td>
                   <td class="p-2 whitespace-nowrap text-center">
                     <div class="text-lg text-center">
                       <a
                         class="dropdown-item mx-auto"
                         href="#"
-                        @click.prevent="tryToDeleteDevice(device.id)"
+                        @click.prevent="tryToDeleteDevice(device._id)"
                       >
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
@@ -153,7 +157,6 @@
       </div>
     </div>
 
-    <!-- component -->
     <div
       id="modal"
       :class="{ hidden: !dailog }"
@@ -162,7 +165,6 @@
       <div
         class="relative top-40 mx-auto shadow-lg rounded-md bg-white max-w-md"
       >
-        <!-- Modal header -->
         <div
           class="flex justify-between items-center bg-green-500 text-white text-xl rounded-t-md px-4 py-2"
         >
@@ -188,12 +190,26 @@
           class="border relative px-4 pt-7 pb-8 bg-white shadow-xl w-full max-w-md mx-auto sm:px-10 rounded-b-md"
         >
           <form @submit.prevent="onSubmit">
+            <label class="block">UID</label>
+            <input
+              v-model="deviceForm.uid"
+              type="text"
+              class="border w-full h-10 px-3 mb-5 rounded-md"
+              placeholder="UID"
+            />
             <label class="block">Vendor</label>
             <input
               v-model="deviceForm.vendor"
               type="text"
               class="border w-full h-10 px-3 mb-5 rounded-md"
               placeholder="vendor"
+            />
+            <label class="block">Created Date</label>
+            <input
+              v-model="deviceForm.createdDate"
+              type="date"
+              class="border w-full h-10 px-3 mb-5 rounded-md"
+              placeholder="Created Date"
             />
             <div class="flex items-start w-full">
               <div class="flex items-start w-full">
@@ -211,8 +227,8 @@
                       autocomplete="country"
                       class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                     >
-                      <option value="ONLINE">Online</option>
-                      <option value="OFFLINE">Offline</option>
+                      <option value="online">Online</option>
+                      <option value="offline">Offline</option>
                     </select>
                   </div>
                 </div>
@@ -242,9 +258,9 @@ export default {
       loading: false,
       dailog: false,
       deviceForm: {
-        gateway: '',
+        uid: '',
         vendor: '',
-        status: 'OFFLINE',
+        status: 'offline',
       },
     }
   },
@@ -272,20 +288,26 @@ export default {
       createDevice: 'gateway/createDevice',
     }),
 
+    formatDate(date) {
+      const options = { year: 'numeric', month: 'long', day: 'numeric' }
+      return new Date(date).toLocaleDateString('en', options)
+    },
+
     async onSubmit() {
       this.loading = await true
-      this.deviceForm.gateway = this.$route.params.id
+      this.deviceForm.gatewayId = this.$route.params.id
       const res = await this.createDevice(this.deviceForm)
       this.loading = await false
       if (res) {
-        this.deviceForm.vendor = ''
+        this.deviceForm = {}
+        this.deviceForm.status = 'offline'
         this.$toast.success('Device created successfully.')
         this.dailog = !this.dailog
       }
     },
 
     async tryToDeleteDevice(id) {
-      await this.deleteDevice(id)
+      await this.deleteDevice({ gatewayId: this.$route.params.id, id })
     },
   },
 }

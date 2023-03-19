@@ -5,11 +5,9 @@ services:
     ports:
       - "5000:5000"
     volumes:
-      - .:/app
+      - .:./
     environment:
       NODE_ENV: development
-      DATABASE_USERNAME: root
-      DATABASE_PASSWORD: test
       DATABASE_URI: mongodb://mongo:27017/gateway_db
     depends_on:
       - mongo
@@ -18,7 +16,7 @@ services:
     ports:
       - "3000:3000"
     volumes:
-      - .:/app
+      - .:./
     depends_on:
       - backend
   mongo:

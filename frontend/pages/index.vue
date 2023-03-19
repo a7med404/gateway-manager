@@ -1,8 +1,6 @@
 <template>
-  <!-- component -->
   <section class="antialiased bg-gray-100 text-gray-600 h-screen px-4">
     <div class="flex flex-col justify-center h-full">
-      <!-- Table -->
       <div
         class="w-full max-w-2xl mx-auto bg-white shadow-lg rounded-sm border border-gray-200"
       >
@@ -10,7 +8,6 @@
           class="border-b border-gray-100 flex items-center justify-between px-5 py-4"
         >
           <h2 class="font-semibold text-gray-800">Gateways</h2>
-
           <button
             class="uppercase font-semibold tracking-wide bg-green-100 text-green-700 px-4 py-2 rounded-lg mt-2 focus:outline-none hover:bg-green-200"
             @click="dailog = !dailog"
@@ -43,6 +40,9 @@
                     <div class="font-semibold text-left">Name</div>
                   </th>
                   <th class="p-2 whitespace-nowrap">
+                    <div class="font-semibold text-left">Serial Number</div>
+                  </th>
+                  <th class="p-2 whitespace-nowrap">
                     <div class="font-semibold text-left">IP Address</div>
                   </th>
                   <th class="p-2 whitespace-nowrap">
@@ -57,32 +57,34 @@
                 v-if="gateways.length"
                 class="text-sm divide-y divide-gray-100"
               >
-                <tr v-for="gateway in gateways" :key="gateway.id">
+                <tr v-for="gateway in gateways" :key="gateway._id">
                   <td class="p-2 whitespace-nowrap">
                     <div class="flex items-center">
                       <div
                         class="font-medium text-blue-500"
-
                       >
                       <nuxt-link
-                      tag="a"
-                      class="dropdown-item"
-                      :to="{
-                        name: 'gateways-id-show',
-                        params: { id: gateway.id },
-                      }"
-                      v-text="gateway.name"
-                    >
-                      </nuxt-link>
+                        tag="a"
+                        class="dropdown-item"
+                        :to="{
+                          name: 'gateways-id-show',
+                          params: { id: gateway._id },
+                        }"
+                        v-text="gateway.name"
+                      />
                       </div>
                     </div>
                   </td>
                   <td class="p-2 whitespace-nowrap">
-                    <div class="text-left" v-text="gateway.iPv4Address"></div>
+                    <div class="text-left" v-text="gateway.serialNumber"></div>
+                  </td>
+                  <td class="p-2 whitespace-nowrap">
+                    <div class="text-left" v-text="gateway.ipv4Address"></div>
                   </td>
                   <td class="p-2 whitespace-nowrap">
                     <div
-                      class="text-center font-medium text-green-500"
+                      class="text-center font-medium"
+                      :class="gateway.devices.length == 10 ? 'text-red-500' : 'text-green-500'"
                       v-text="gateway.devices.length"
                     ></div>
                   </td>
@@ -92,7 +94,7 @@
                       class="dropdown-item"
                       :to="{
                         name: 'gateways-id-show',
-                        params: { id: gateway.id },
+                        params: { id: gateway._id },
                       }"
                     >
                       <svg
@@ -113,7 +115,7 @@
                     <a
                       class="dropdown-item"
                       href="#"
-                      @click.prevent="tryToDeleteGateway(gateway.id)"
+                      @click.prevent="tryToDeleteGateway(gateway._id)"
                     >
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
@@ -165,7 +167,6 @@
       </div>
     </div>
 
-    <!-- component -->
     <div
       id="modal"
       :class="{ hidden: !dailog }"
@@ -174,7 +175,6 @@
       <div
         class="relative top-40 mx-auto shadow-lg rounded-md bg-white max-w-md"
       >
-        <!-- Modal header -->
         <div
           class="flex justify-between items-center bg-green-500 text-white text-xl rounded-t-md px-4 py-2"
         >
@@ -200,6 +200,13 @@
           class="border relative px-4 pt-7 pb-8 bg-white shadow-xl w-full max-w-md mx-auto sm:px-10 rounded-b-md"
         >
           <form @submit.prevent="onSubmit">
+            <label class="block">Serial Number</label>
+            <input
+              v-model="gatewayForm.serialNumber"
+              type="text"
+              class="border w-full h-10 px-3 mb-5 rounded-md"
+              placeholder="Serial Number"
+            />
             <label class="block">Name</label>
             <input
               v-model="gatewayForm.name"
@@ -209,7 +216,7 @@
             />
             <label class="block">IP Address</label>
             <input
-              v-model="gatewayForm.iPv4Address"
+              v-model="gatewayForm.ipv4Address"
               type="text"
               class="border w-full h-10 px-3 mb-5 rounded-md"
               placeholder="127.0.0.1"
@@ -232,13 +239,13 @@
 import { mapGetters, mapActions } from 'vuex'
 
 export default {
-  components: {},
   data() {
     return {
       loading: false,
       dailog: false,
       gatewayForm: {
-        iPv4Address: '',
+        serialNumber: '',
+        ipv4Address: '',
         name: '',
       },
     }
@@ -273,8 +280,7 @@ export default {
       const res = await this.createGateway(this.gatewayForm)
       this.loading = await false
       if (res) {
-        this.gatewayForm.name = ''
-        this.gatewayForm.iPv4Address = ''
+        this.gatewayForm = {}
         this.$toast.success('Gateway created successfully.')
         this.dailog = !this.dailog
       }
