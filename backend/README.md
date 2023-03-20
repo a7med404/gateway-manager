@@ -1,16 +1,13 @@
-Gateways
-==
-
 # Gateways API
-Please check https://documenter.getpostman.com/view/5236070/2s93JzN1hj file for API document.
+Please check https://documenter.getpostman.com/view/5236070/2s93JzN1hj for API documentation and examples.
 
-## Development
+## Build Setup
 
 Please use following commands to run project.
 
 
 ```bash
-# iset
+# copy and set the environment variables
 $ cp .env.example .env
 
 # install dependencies
@@ -35,3 +32,5 @@ Please use following commands to run project in docker environment.
 $ docker build -t backend .
 $ docker run -p 5000:5000 -t --env-file .env backend
 ```
+
+Once the containers are up and running, you can access the frontend at http://localhost:5000.
