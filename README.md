@@ -23,9 +23,9 @@ https://docs.docker.com/
 **Environments Files**
 copy and rename the following files to .env
 
-```$ frontend/.env.example```
+```$ cp frontend/.env.example frontend/.env```
 
-```$ backend/.env.example```
+```$ cp backend/.env.example  backend/.env````
 
 Docker compose documentation is available on [Docker's website](https://docs.docker.com/compose/).
 
@@ -45,7 +45,6 @@ Commands to run the backend, frontend, and MongoDB in docker:
 **Run shell in a container (SSH into container)**
 
 ```docker exec -it [container-name] /bin/bash```
-
 
 
 
@@ -103,8 +102,8 @@ $ npm run dev
 
 # build for production and launch server
 $ npm run build
-$ npm run start
 
+$ npm run start
 ```
 
 Once the app is up and running, you can access the frontend at http://localhost:3000.
