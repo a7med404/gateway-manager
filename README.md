@@ -35,6 +35,9 @@ Commands to run the backend, frontend, and MongoDB in docker:
 **Re-build the containers**
 
 ```docker-compose up -d --build```
+Or 
+
+```docker-compose up --build```
 
 
 **Stop the Docker containers**
