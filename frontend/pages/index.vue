@@ -2,7 +2,7 @@
   <section class="antialiased bg-gray-100 text-gray-600 h-screen px-4">
     <div class="flex flex-col justify-center h-full">
       <div
-        class="w-full max-w-2xl mx-auto bg-white shadow-lg rounded-sm border border-gray-200"
+        class="w-full max-w-3xl mx-auto bg-white shadow-lg rounded-sm border border-gray-200"
       >
         <header
           class="border-b border-gray-100 flex items-center justify-between px-5 py-4"
@@ -29,8 +29,8 @@
             Add Gateway
           </button>
         </header>
-        <div class="p-3">
-          <div class="overflow-x-auto h-72">
+        <div class="max-h-72 overflow-y-scroll p-3">
+          <div class="overflow-x-auto">
             <table class="table-auto w-full">
               <thead
                 class="text-xs font-semibold uppercase text-gray-500 bg-gray-50"
@@ -91,47 +91,21 @@
                   <td class="flex justify-evenly text-center">
                     <nuxt-link
                       tag="a"
-                      class="dropdown-item"
+                      class="dropdown-item text-blue-500"
                       :to="{
                         name: 'gateways-id-show',
                         params: { id: gateway._id },
                       }"
                     >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        class="h-5 w-5"
-                        viewBox="0 0 20 20"
-                        fill="currentColor"
-                      >
-                        <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
-                        <path
-                          fill-rule="evenodd"
-                          d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z"
-                          clip-rule="evenodd"
-                        />
-                      </svg>
+                      Show
                     </nuxt-link>
                     -
                     <a
-                      class="dropdown-item"
+                      class="dropdown-item text-red-500"
                       href="#"
                       @click.prevent="tryToDeleteGateway(gateway._id)"
                     >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        class="h-6 w-6"
-                        fill="red"
-                        style="color: antiquewhite"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                      >
-                        <path
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          stroke-width="2"
-                          d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                        />
-                      </svg>
+                      Delete
                     </a>
                   </td>
                 </tr>

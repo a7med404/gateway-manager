@@ -3,7 +3,7 @@
     <div class="flex flex-col justify-center h-full">
       <div
         v-if="gateway"
-        class="w-full max-w-2xl mx-auto bg-white shadow-lg rounded-sm border border-gray-200"
+        class="w-full max-w-3xl mx-auto bg-white shadow-lg rounded-sm border border-gray-200"
       >
         <div class="py-4 px-8 bg-white shadow-lg rounded-lg my-5">
           <div>
@@ -41,7 +41,7 @@
             Gateway's devices [{{ gateway.devices.length }}]
           </h2>
         </header>
-        <div class="overflow-y-scroll p-3">
+        <div class="max-h-72 overflow-y-scroll p-3">
           <div class="overflow-x-auto">
             <table class="table-auto w-full">
               <thead
@@ -101,25 +101,11 @@
                   <td class="p-2 whitespace-nowrap text-center">
                     <div class="text-lg text-center">
                       <a
-                        class="dropdown-item mx-auto"
+                        class="dropdown-item mx-auto text-red-500"
                         href="#"
                         @click.prevent="tryToDeleteDevice(device._id)"
                       >
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          class="h-6 mx-auto w-6"
-                          fill="red"
-                          style="color: antiquewhite"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                        >
-                          <path
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            stroke-width="2"
-                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                          />
-                        </svg>
+                        Delete
                       </a>
                     </div>
                   </td>
