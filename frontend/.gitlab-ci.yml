@@ -1,0 +1,49 @@
+image: node:16
+
+stages:
+  - build
+  - test
+  - deploy
+
+build:
+  stage: build
+  cache:
+    paths:
+      - node_modules/
+  artifacts:
+    expire_in: 1 day
+    name: "$CI_COMMIT_REF_SLUG-$CI_COMMIT_SHORT_SHA"
+    paths:
+      - ./dist
+  script:
+    - echo "This job compiles code."
+    - npm run install
+    - npm run build
+  only:
+  - develop
+
+
+test_job:
+  stage: test
+  variables:
+    GIT_STRATEGY: none
+  script:
+    - npm run lint:js
+    - npm run audit --level high --groups dependencies
+    - npm run test
+  only:
+  - develop
+
+deploy:
+  stage: deploy
+  variables:
+    GIT_STRATEGY: none
+  before_script: []
+  environment:
+    name: staging
+    # url:  # site url
+  script:
+    - echo "This job deploys the code to the server."
+    - rsync -rWzog --links --delete ./dist/  # path in your server for staging
+  only:
+    - develop

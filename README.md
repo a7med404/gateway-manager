@@ -128,3 +128,8 @@ commands to run the backend, frontend and monogodb in docker:
 Gitlab ci documentation is available on [gitlab's website](https://docs.gitlab.com/ee/ci/index.html).
 
 ```$ please configur .gitlab-ci.yml file in backend and frontend dirs```
+
+
+
+## Conclusion
+This solution provides a simple yet effective way to manage gateways and their associated devices. By using Node.js and MongoDB, we can easily store and retrieve information about gateways and their devices. Additionally, by using Joi, we can validate user input to ensure that the data is accurate and valid. The frontend provides a basic UI for displaying and manipulating the data, while the backend provides a REST API for programmatic access. Overall, this solution is robust, scalable,
