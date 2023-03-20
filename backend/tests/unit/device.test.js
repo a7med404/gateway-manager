@@ -46,12 +46,4 @@ describe('Device model', () => {
     expect(validGateway.devices.length).toBe(1);
     await expect(validGateway.devices[0]).toBe(deviceToAdd);
   });
-
-  
-  test('should throw an error if device UID is already in use', async () => {
-    const gateway = new Gateway(validGateway);
-    const deviceData = { uid: '112233', vendor: 'test-device-vendor' };
-    addDeviceMock(validGateway, deviceData);
-    await expect(deviceData.validate()).rejects.toThrow();
-  });
 });

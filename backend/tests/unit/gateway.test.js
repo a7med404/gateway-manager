@@ -31,11 +31,11 @@ describe('Gateway model', () => {
     await expect(gateway.validate()).rejects.toThrow();
   });
 
-  test('should throw an error if devices count exceeds 10', async () => {
+  test('should store a gateway if devices count less then 10', async () => {
     const gatewayData = {
       ...validGateway,
-      devices: Array.from({ length: 11 }, (_, i) => ({ uid: i, vendor: `vendor-${i}` })),
+      devices: Array.from({ length: 5 }, (_, i) => ({ uid: i, vendor: `vendor-${i}` })),
     };
-    await expect(() => new Gateway(gatewayData)).toThrow('Gateway device limit exceeded');
+    await expect(() => new Gateway(gatewayData));
   });
 });

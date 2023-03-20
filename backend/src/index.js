@@ -18,14 +18,17 @@ mongoose.connect(process.env.DATABASE_URI, { useNewUrlParser: true })
   .then(() => console.log('Connected to MongoDB ...'))
   .catch((err) => console.error(err));
 
-
 app.get('/', (req, res) => {
-  return res.json({ message: 'OK' });
+  return res.json({ message: 'API gateway manager is running' });
 });
 
 // Mount the gateway and device routes
 app.use('/api/v1/gateways', gatewayRoutes);
 app.use('/api/v1/devices', deviceRoutes);
+
+app.get('*', function(req, res){
+  res.status(404).json({ message: 'Not Found, Unable to find the requested resource!' });
+});
 
 // Start the server
 const PORT = process.env.PORT || 5000;
