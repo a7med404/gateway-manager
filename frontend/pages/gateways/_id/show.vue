@@ -96,7 +96,7 @@
                     ></div>
                   </td>
                   <td class="p-2 whitespace-nowrap">
-                    <div class="text-left" v-text="formatDate(deviceForm.createdDate)"></div>
+                    <div class="text-left" v-text="formatDate(device.createdDate)"></div>
                   </td>
                   <td class="p-2 whitespace-nowrap text-center">
                     <div class="text-lg text-center">

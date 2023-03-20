@@ -6,6 +6,7 @@
   "scripts": {
     "start": "node src",
     "dev": "pm2 start --name app --watch ./src --no-daemon --time src",
+    "seed": "node src/seeds.js",
     "test": "jest tests/unit"
   },
   "author": "",
@@ -20,6 +21,7 @@
     "mongoose": "^7.0.2"
   },
   "devDependencies": {
+    "@faker-js/faker": "^7.6.0",
     "jest": "^29.5.0",
     "pm2": "5.2.0",
     "supertest": "^6.2.4"
